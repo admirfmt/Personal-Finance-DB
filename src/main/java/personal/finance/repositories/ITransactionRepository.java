@@ -9,5 +9,7 @@ public interface ITransactionRepository {
     List<Transaction> load();
     // spara till filen
     void save(List<Transaction> transactions);
+    //
+    void deleteById(long id);
 
 }

@@ -53,4 +53,9 @@ public class FileTransactionRepository implements ITransactionRepository {
             System.out.println("Fel uppstod: " + exception.getMessage());
         }
     }
+
+    @Override
+    public void deleteById(long id) {
+        // används för databas
+    }
 }

@@ -2,6 +2,7 @@ package personal.finance.service;
 
 import personal.finance.models.Transaction;
 import personal.finance.repositories.ITransactionRepository;
+import personal.finance.repositories.PostgresTransactionRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ public class DefaultTransactionService implements ITransactionService {
 
     @Override
     public void addTransaction(Transaction transaction) {
+        //if (transaction.getId() == null) {
+        //    ((PostgresTransactionRepository) transactionRepository).insert(transaction);
+        //}
         transactionList.add(transaction);
         transactionRepository.save(transactionList);
     }
@@ -24,9 +28,11 @@ public class DefaultTransactionService implements ITransactionService {
     @Override
     public Transaction deleteTransaction(int index) {
         if (index >= 0 && index < transactionList.size()) {
-            Transaction removedTransaction = transactionList.remove(index);
-            transactionRepository.save(transactionList);
-            return removedTransaction;
+            Transaction removed = transactionList.remove(index);
+            if (removed.getId() != null) {
+                transactionRepository.deleteById(removed.getId());
+            }
+            return removed;
         }
         return null;
     }

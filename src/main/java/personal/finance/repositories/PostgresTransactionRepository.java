@@ -33,12 +33,13 @@ public class PostgresTransactionRepository implements ITransactionRepository {
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
+                Long id = rs.getLong("id");
                 String description = rs.getString("description");
                 double amount = rs.getDouble("amount");
                 String type = rs.getString("type");
                 LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
 
-                transactions.add(new Transaction(description, amount, type, date));
+                transactions.add(new Transaction(id, description, amount, type, date));
             }
         } catch (SQLException e) {
             System.out.println("Kunde inte ladda transaktioner: " + e.getMessage());
@@ -66,4 +67,17 @@ public class PostgresTransactionRepository implements ITransactionRepository {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void deleteById(long id) {
+        String sql = "DELETE FROM transactions WHERE id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Fel vid radering av transaktion: " + e.getMessage());
+        }
+    }
+
 }
