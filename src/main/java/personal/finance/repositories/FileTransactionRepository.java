@@ -56,6 +56,16 @@ public class FileTransactionRepository implements ITransactionRepository {
 
     @Override
     public void deleteById(long id) {
-        // används för databas
+        // används endast för databas
+    }
+
+    @Override
+    public void update(long id, Transaction transaction) {
+        // används endast för databas
+    }
+
+    @Override
+    public void insert(Transaction transaction) {
+        // används endast för databas
     }
 }

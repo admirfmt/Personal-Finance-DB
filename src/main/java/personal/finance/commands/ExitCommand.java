@@ -10,7 +10,7 @@ public class ExitCommand extends Command {
 
     @Override
     public void execute() {
-        transactionService.saveTransactionToFile();
+        // transactionService.saveTransactionToFile();
         System.exit(0);
     }
 }

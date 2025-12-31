@@ -13,4 +13,5 @@ public interface ITransactionService {
     void saveTransactionToFile();
     double calculateBalance();
     List<Transaction> getAllTransactions();
+    void updateTransaction(int index, Transaction updated);
 }

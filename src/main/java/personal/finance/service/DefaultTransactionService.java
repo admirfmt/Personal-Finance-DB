@@ -18,11 +18,10 @@ public class DefaultTransactionService implements ITransactionService {
 
     @Override
     public void addTransaction(Transaction transaction) {
-        //if (transaction.getId() == null) {
-        //    ((PostgresTransactionRepository) transactionRepository).insert(transaction);
-        //}
+        if (transaction.getId() == null) {
+            transactionRepository.insert(transaction);
+        }
         transactionList.add(transaction);
-        transactionRepository.save(transactionList);
     }
 
     @Override
@@ -35,6 +34,18 @@ public class DefaultTransactionService implements ITransactionService {
             return removed;
         }
         return null;
+    }
+
+    public void updateTransaction(int index, Transaction updated) {
+        if (index >= 0 && index < transactionList.size()) {
+            Transaction old = transactionList.get(index);
+            Long id = old.getId();
+            updated.setId(id);
+            transactionList.set(index, updated);
+            if (id != null) {
+                transactionRepository.update(id, updated);
+            }
+        }
     }
 
     @Override

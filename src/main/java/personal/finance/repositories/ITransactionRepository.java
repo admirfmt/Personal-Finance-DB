@@ -9,7 +9,10 @@ public interface ITransactionRepository {
     List<Transaction> load();
     // spara till filen
     void save(List<Transaction> transactions);
-    //
+    // radera från databas
     void deleteById(long id);
-
+    // uppdatera transaktion i databas
+    void update(long id, Transaction transaction);
+    // lägg en transaktion
+    void insert(Transaction transaction);
 }

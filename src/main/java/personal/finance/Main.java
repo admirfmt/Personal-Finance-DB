@@ -27,6 +27,7 @@ public class Main {
 
         commandService.registerCommand(new AddTransactionCommand(transactionService));
         commandService.registerCommand(new DeleteTransactionCommand(transactionService));
+        commandService.registerCommand(new UpdateTransactionCommand(transactionService));
         commandService.registerCommand(new ShowBalanceCommand(transactionService));
         commandService.registerCommand(new ShowOutcomesCommand(transactionService));
         commandService.registerCommand(new ShowIncomesCommand(transactionService));

@@ -80,4 +80,44 @@ public class PostgresTransactionRepository implements ITransactionRepository {
         }
     }
 
+    @Override
+    public void update(long id, Transaction t) {
+        String sql = "UPDATE transactions SET description = ?, amount = ?, type = ?, date = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, t.getDescription());
+            ps.setDouble(2, t.getAmount());
+            ps.setString(3, t.getType());
+            ps.setTimestamp(4, Timestamp.valueOf(t.getDate()));
+            ps.setLong(5, id);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println("Fel vid uppdatering av transaktion: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void insert(Transaction t) {
+        String sql = "INSERT INTO transactions(description, amount, type, date) VALUES (?, ?, ?, ?) RETURNING id";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, t.getDescription());
+            ps.setDouble(2, t.getAmount());
+            ps.setString(3, t.getType());
+            ps.setTimestamp(4, Timestamp.valueOf(t.getDate()));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    long id = rs.getLong(1);
+                    t.setId(id);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Fel vid insert av transaktion: " + e.getMessage());
+        }
+    }
+
 }
