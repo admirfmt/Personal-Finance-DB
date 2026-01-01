@@ -20,6 +20,7 @@ public class DeleteTransactionCommand extends Command {
         // kolla om det inte är tomt
         if (transactions.isEmpty()) {
             System.out.println("Inga transaktioner att radera.");
+            return;
         }
 
         for (int i = 0; i < transactions.size(); i++) {

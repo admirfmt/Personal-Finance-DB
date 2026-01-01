@@ -5,7 +5,7 @@ import personal.finance.service.ITransactionService;
 public abstract class Command {
     protected final String name;
     protected final String description;
-    protected ITransactionService transactionService;
+    public ITransactionService transactionService;
 
     protected Command(String name, String description, ITransactionService transactionService) {
         this.name = name;

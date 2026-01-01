@@ -43,7 +43,7 @@ public class UpdateTransactionCommand extends Command {
 
         Transaction oldTransaction = transactions.get(choice - 1);
 
-        // kanske hitta bättre sätt att göra den?
+        // kanske hitta ett bättre sätt att göra dessa?
         // beskrivning
         System.out.print("Ny beskrivning (lämna tom för att behålla \"" +
                 oldTransaction.getDescription() + "\"): ");
@@ -80,7 +80,7 @@ public class UpdateTransactionCommand extends Command {
             newDateTime = oldTransaction.getDate();
         }
 
-        Transaction updatedTransaction = new Transaction(oldTransaction.getId(), newDescription, newAmount, newType, newDateTime);
+        Transaction updatedTransaction = new Transaction(oldTransaction.getId(), oldTransaction.getUserId(), newDescription, newAmount, newType, newDateTime);
 
         transactionService.updateTransaction(choice - 1, updatedTransaction);
 

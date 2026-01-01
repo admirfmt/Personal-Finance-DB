@@ -10,13 +10,16 @@ import java.util.List;
 
 public class PostgresTransactionRepository implements ITransactionRepository {
     private final Connection connection;
+    private long currentUserId;
 
     public PostgresTransactionRepository(String url, String user, String password) throws SQLException {
 
         connection = DriverManager.getConnection(url, user, password);
+
         try (Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE IF NOT EXISTS transactions (" +
                     "id SERIAL PRIMARY KEY," +
+                    "user_id BIGINT NOT NULL," +
                     "description TEXT NOT NULL," +
                     "amount DOUBLE PRECISION NOT NULL," +
                     "type TEXT NOT NULL," +
@@ -25,21 +28,29 @@ public class PostgresTransactionRepository implements ITransactionRepository {
         }
     }
 
+    public void setCurrentUserId(long userId) {
+        this.currentUserId = userId;
+    }
+
     @Override
     public List<Transaction> load() {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions";
+        String sql = "SELECT * FROM transactions WHERE user_id = ?";
+        if (currentUserId == 0) {
+            return transactions; // Ingen användare inloggad
+        }
 
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
-                Long id = rs.getLong("id");
+                long id = rs.getLong("id");
+                long userId = rs.getLong("user_id");
                 String description = rs.getString("description");
                 double amount = rs.getDouble("amount");
                 String type = rs.getString("type");
                 LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
 
-                transactions.add(new Transaction(id, description, amount, type, date));
+                transactions.add(new Transaction(id, userId, description, amount, type, date));
             }
         } catch (SQLException e) {
             System.out.println("Kunde inte ladda transaktioner: " + e.getMessage());
@@ -64,17 +75,18 @@ public class PostgresTransactionRepository implements ITransactionRepository {
             }
             statement.executeBatch();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Fel vid sparing av transaktion: " + e.getMessage());
         }
     }
 
     @Override
     public void deleteById(long id) {
-        String sql = "DELETE FROM transactions WHERE id = ?";
+        String sql = "DELETE FROM transactions WHERE id = ? AND user_id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, id);
-            ps.executeUpdate();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            statement.setLong(2, currentUserId);
+            statement.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Fel vid radering av transaktion: " + e.getMessage());
         }
@@ -82,16 +94,17 @@ public class PostgresTransactionRepository implements ITransactionRepository {
 
     @Override
     public void update(long id, Transaction t) {
-        String sql = "UPDATE transactions SET description = ?, amount = ?, type = ?, date = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        String sql = "UPDATE transactions SET description = ?, amount = ?, type = ?, date = ? WHERE id = ? AND user_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            ps.setString(1, t.getDescription());
-            ps.setDouble(2, t.getAmount());
-            ps.setString(3, t.getType());
-            ps.setTimestamp(4, Timestamp.valueOf(t.getDate()));
-            ps.setLong(5, id);
+            statement.setString(1, t.getDescription());
+            statement.setDouble(2, t.getAmount());
+            statement.setString(3, t.getType());
+            statement.setTimestamp(4, Timestamp.valueOf(t.getDate()));
+            statement.setLong(5, id);
+            statement.setLong(6, currentUserId);
 
-            ps.executeUpdate();
+            statement.executeUpdate();
 
         } catch (SQLException e) {
             System.out.println("Fel vid uppdatering av transaktion: " + e.getMessage());
@@ -100,18 +113,20 @@ public class PostgresTransactionRepository implements ITransactionRepository {
 
     @Override
     public void insert(Transaction t) {
-        String sql = "INSERT INTO transactions(description, amount, type, date) VALUES (?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO transactions(user_id, description, amount, type, date) VALUES (?, ?, ?, ?, ?) RETURNING id";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, t.getDescription());
-            ps.setDouble(2, t.getAmount());
-            ps.setString(3, t.getType());
-            ps.setTimestamp(4, Timestamp.valueOf(t.getDate()));
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, currentUserId);
+            statement.setString(2, t.getDescription());
+            statement.setDouble(3, t.getAmount());
+            statement.setString(4, t.getType());
+            statement.setTimestamp(5, Timestamp.valueOf(t.getDate()));
 
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
                     long id = rs.getLong(1);
                     t.setId(id);
+                    t.setUserId(currentUserId);
                 }
             }
 
