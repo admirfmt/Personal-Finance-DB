@@ -1,9 +1,6 @@
 package personal.finance;
 
 import personal.finance.commands.*;
-import personal.finance.models.User;
-import personal.finance.repositories.ITransactionRepository;
-import personal.finance.repositories.IUserRepository;
 import personal.finance.repositories.PostgresTransactionRepository;
 import personal.finance.repositories.PostgresUserRepository;
 import personal.finance.service.*;
@@ -34,6 +31,7 @@ public class Main {
         commandService.registerCommand(new LoginUserCommand(userService));
         commandService.registerCommand(new LogoutUserCommand(userService));
 
+        // transaktion-kommandon
         commandService.registerCommand(new AddTransactionCommand(transactionService));
         commandService.registerCommand(new DeleteTransactionCommand(transactionService));
         commandService.registerCommand(new UpdateTransactionCommand(transactionService));

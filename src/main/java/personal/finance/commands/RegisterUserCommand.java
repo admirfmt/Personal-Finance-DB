@@ -1,13 +1,17 @@
 package personal.finance.commands;
 
 import personal.finance.models.User;
+import personal.finance.repositories.IUserRepository;
 import personal.finance.service.IUserService;
+
+import java.util.Optional;
 
 import static personal.finance.utility.Helper.scanner;
 
 public class RegisterUserCommand extends Command {
 
     private final IUserService userService;
+    private IUserRepository userRepository;
 
     public RegisterUserCommand(IUserService userService) {
         super("Registrera användare", "Registrera ny användare", null);

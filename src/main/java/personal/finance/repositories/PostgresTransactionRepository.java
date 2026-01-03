@@ -40,18 +40,21 @@ public class PostgresTransactionRepository implements ITransactionRepository {
             return transactions; // Ingen användare inloggad
         }
 
-        try (PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet rs = statement.executeQuery()) {
-            while (rs.next()) {
-                long id = rs.getLong("id");
-                long userId = rs.getLong("user_id");
-                String description = rs.getString("description");
-                double amount = rs.getDouble("amount");
-                String type = rs.getString("type");
-                LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+             statement.setLong(1, currentUserId);
 
-                transactions.add(new Transaction(id, userId, description, amount, type, date));
-            }
+             try(ResultSet rs = statement.executeQuery()) {
+                 while (rs.next()) {
+                     long id = rs.getLong("id");
+                     long userId = rs.getLong("user_id");
+                     String description = rs.getString("description");
+                     double amount = rs.getDouble("amount");
+                     String type = rs.getString("type");
+                     LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
+
+                     transactions.add(new Transaction(id, userId, description, amount, type, date));
+                 }
+             }
         } catch (SQLException e) {
             System.out.println("Kunde inte ladda transaktioner: " + e.getMessage());
         }
@@ -63,20 +66,7 @@ public class PostgresTransactionRepository implements ITransactionRepository {
 
     @Override
     public void save(List<Transaction> transactions) {
-        String sql = "INSERT INTO transactions(description, amount, type, date) VALUES (?, ?, ?, ?)";
-
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            for (Transaction t : transactions) {
-                statement.setString(1, t.getDescription());
-                statement.setDouble(2, t.getAmount());
-                statement.setString(3, t.getType());
-                statement.setTimestamp(4, Timestamp.valueOf(t.getDate()));
-                statement.addBatch();
-            }
-            statement.executeBatch();
-        } catch (SQLException e) {
-            System.out.println("Fel vid sparing av transaktion: " + e.getMessage());
-        }
+        // används inte med databasen
     }
 
     @Override
@@ -134,5 +124,4 @@ public class PostgresTransactionRepository implements ITransactionRepository {
             System.out.println("Fel vid insert av transaktion: " + e.getMessage());
         }
     }
-
 }

@@ -3,9 +3,7 @@ package personal.finance.service;
 import personal.finance.commands.*;
 import personal.finance.models.User;
 import personal.finance.repositories.FileTransactionRepository;
-import personal.finance.repositories.ITransactionRepository;
 import personal.finance.repositories.PostgresTransactionRepository;
-import personal.finance.repositories.PostgresUserRepository;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -35,7 +33,6 @@ public class TerminalCommandService implements ICommandService{
             postgresTransactionRepository.setCurrentUserId(0);
         }
 
-        // Skapa ny service för att ladda om transaktioner
         transactionService = new DefaultTransactionService(postgresTransactionRepository);
 
         // Uppdatera alla kommandon som använder transactionService
@@ -45,6 +42,7 @@ public class TerminalCommandService implements ICommandService{
             }
         }
     }
+
     public void run() {
 
         fileTransactionRepository.load();
@@ -61,23 +59,24 @@ public class TerminalCommandService implements ICommandService{
             System.out.println("Välj ett alternativ: ");
 
             int index = 1;
-            List<Command> availableCommands = new ArrayList<>();
+            List<Integer> availableCommands = new ArrayList<>();
 
-            for (Command cmd : commands) {
+            for (int i = 0; i < commands.size(); i++) {
+                Command cmd = commands.get(i);
                 // Om inte inloggad visa bara Register, Login och Exit
                 if (currentUser == null) {
                     if (cmd instanceof RegisterUserCommand ||
                             cmd instanceof LoginUserCommand ||
                             cmd instanceof ExitCommand) {
                         System.out.printf("%d. %s - %s%n", index++, cmd.getName(), cmd.getDescription());
-                        availableCommands.add(cmd);
+                        availableCommands.add(i);
                     }
                 } else {
                     // Om inloggad visa allt annat
                     if (!(cmd instanceof RegisterUserCommand ||
                             cmd instanceof LoginUserCommand)) {
                         System.out.printf("%d. %s - %s%n", index++, cmd.getName(), cmd.getDescription());
-                        availableCommands.add(cmd);
+                        availableCommands.add(i);
                     }
                 }
             }
@@ -94,14 +93,14 @@ public class TerminalCommandService implements ICommandService{
             }
 
             if (option > 0 && option <= availableCommands.size()) {
-                Command selectedCommand = availableCommands.get(option - 1);
+                int indexCommand = availableCommands.get(option - 1);
+                Command selectedCommand = commands.get(indexCommand);
+                executeCommand(indexCommand + 1);
 
                 // Kolla om det är login/logout kommando
                 if (selectedCommand instanceof LoginUserCommand || selectedCommand instanceof LogoutUserCommand) {
-                    selectedCommand.execute();
-                    updateTransactionService(); // Uppdatera efter användarändring
-                } else {
-                    selectedCommand.execute();
+                    // selectedCommand.execute();
+                    updateTransactionService();
                 }
             } else {
                 System.out.println("Ogiltigt val!");

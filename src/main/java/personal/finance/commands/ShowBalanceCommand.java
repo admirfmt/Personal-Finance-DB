@@ -26,6 +26,7 @@ public class ShowBalanceCommand extends Command {
             System.out.println("\nTotalt " + transactions.size() + " transaktioner.");
         } else {
             System.out.println("\nInga transaktioner att visa.");
+            return;
         }
 
         double balance = transactionService.calculateBalance();

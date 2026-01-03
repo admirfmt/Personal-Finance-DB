@@ -2,9 +2,9 @@ package personal.finance.service;
 
 import personal.finance.models.Transaction;
 import personal.finance.repositories.ITransactionRepository;
-import personal.finance.repositories.PostgresTransactionRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DefaultTransactionService implements ITransactionService {
@@ -60,6 +60,6 @@ public class DefaultTransactionService implements ITransactionService {
 
     @Override
     public List<Transaction> getAllTransactions() {
-        return new ArrayList<>(transactionList);
+        return Collections.unmodifiableList(transactionList);
     }
 }
