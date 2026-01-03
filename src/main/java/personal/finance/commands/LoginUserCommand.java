@@ -7,11 +7,8 @@ import static personal.finance.utility.Helper.scanner;
 
 public class LoginUserCommand extends Command {
 
-    private final IUserService userService;
-
     public LoginUserCommand(IUserService userService) {
-        super("Logga in", "Logga in med användarnamn och lösenord", null);
-        this.userService = userService;
+        super("Logga in", "Logga in med användarnamn och lösenord", userService);
     }
 
     @Override

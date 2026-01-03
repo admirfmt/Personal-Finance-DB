@@ -1,21 +1,14 @@
 package personal.finance.commands;
 
 import personal.finance.models.User;
-import personal.finance.repositories.IUserRepository;
 import personal.finance.service.IUserService;
-
-import java.util.Optional;
 
 import static personal.finance.utility.Helper.scanner;
 
 public class RegisterUserCommand extends Command {
 
-    private final IUserService userService;
-    private IUserRepository userRepository;
-
     public RegisterUserCommand(IUserService userService) {
-        super("Registrera användare", "Registrera ny användare", null);
-        this.userService = userService;
+        super("Registrera användare", "Registrera ny användare", userService);
     }
 
     @Override
@@ -30,7 +23,7 @@ public class RegisterUserCommand extends Command {
         if (user != null) {
             System.out.println("Användare registrerad: " + user.getUsername());
         } else {
-            System.out.println("Registrering misslyckades (kanske finns användarnamnet redan).");
+            System.out.println("Registrering misslyckades.");
         }
     }
 }

@@ -5,7 +5,7 @@ import personal.finance.service.ITransactionService;
 
 import java.util.List;
 
-import static personal.finance.utility.Helper.*;
+import static personal.finance.utility.Helper.scanner;
 
 public class DeleteTransactionCommand extends Command {
 
