@@ -7,5 +7,5 @@ import java.util.Optional;
 public interface IUserRepository {
     User register(String username, String password);
     User login(String username, String password);
-    Optional<User> findByUsername(String username) throws Exception;
+    Optional<User> findByUsername(String username);
 }

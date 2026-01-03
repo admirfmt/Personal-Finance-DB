@@ -99,7 +99,6 @@ public class TerminalCommandService implements ICommandService{
 
                 // Kolla om det är login/logout kommando
                 if (selectedCommand instanceof LoginUserCommand || selectedCommand instanceof LogoutUserCommand) {
-                    // selectedCommand.execute();
                     updateTransactionService();
                 }
             } else {

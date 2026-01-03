@@ -59,23 +59,23 @@ public class PostgresUserRepository implements IUserRepository {
     }
 
     @Override
-    public Optional<User> findByUsername(String username) throws Exception {
+    public Optional<User> findByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
 
-            ResultSet set = statement.executeQuery();
-            if (!set.next()) {
-                return Optional.empty();
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    Long id = rs.getLong("id");
+                    String uname = rs.getString("username");
+                    String password = rs.getString("password");
+                    return Optional.of(new User(id, uname, password));
+                }
             }
-
-            Long id = set.getLong("id");
-            username = set.getString("username");
-            String password = set.getString("password");
-
-            User user = new User(id, username, password);
-            return Optional.of(user);
+        } catch (SQLException e) {
+            System.err.println("Fel vid sökning av användare: " + e.getMessage());
         }
+        return Optional.empty();
     }
 }

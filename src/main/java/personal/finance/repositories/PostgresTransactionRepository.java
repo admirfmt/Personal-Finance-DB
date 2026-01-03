@@ -63,7 +63,6 @@ public class PostgresTransactionRepository implements ITransactionRepository {
         return transactions;
     }
 
-
     @Override
     public void save(List<Transaction> transactions) {
         // används inte med databasen
