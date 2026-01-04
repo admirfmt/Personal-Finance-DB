@@ -14,7 +14,7 @@ public class LogoutUserCommand extends Command {
             System.out.println("Ingen användare är inloggad.");
             return;
         }
-        System.out.println("Loggar ut " + userService.getCurrentUser().getUsername());
+        System.out.println("Loggar ut: " + userService.getCurrentUser().getUsername());
         userService.logout();
     }
 }

@@ -70,7 +70,9 @@ public class PostgresUserRepository implements IUserRepository {
                     Long id = rs.getLong("id");
                     String uname = rs.getString("username");
                     String password = rs.getString("password");
-                    return Optional.of(new User(id, uname, password));
+
+                    User user = new User(id, uname, password);
+                    return Optional.of(user);
                 }
             }
         } catch (SQLException e) {
