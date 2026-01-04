@@ -68,4 +68,9 @@ public class FileTransactionRepository implements ITransactionRepository {
     public void insert(Transaction transaction) {
         // används endast för databas
     }
+
+    @Override
+    public void showTransactionDetails() {
+        // används endast för databas
+    }
 }

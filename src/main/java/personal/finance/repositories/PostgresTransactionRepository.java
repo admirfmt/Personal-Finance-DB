@@ -123,4 +123,30 @@ public class PostgresTransactionRepository implements ITransactionRepository {
             System.out.println("Fel vid insert av transaktion: " + e.getMessage());
         }
     }
+
+    @Override
+    public void showTransactionDetails() {
+        String sql = "SELECT u.username, t.description, t.amount, t.type, t.date " +
+                "FROM transactions t " +
+                "INNER JOIN users u ON t.user_id = u.id " +
+                "WHERE t.user_id = ? ";
+
+        try(PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, currentUserId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    System.out.printf("Användare: %s | %s | %.2f | %s%n",
+                    rs.getString("username"),
+                    rs.getString("description"),
+                    rs.getDouble("amount"),
+                    rs.getString("type"));
+                }
+            } catch (SQLException e) {
+                System.out.println("Något gick fel: " + e.getMessage());
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

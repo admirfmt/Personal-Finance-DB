@@ -2,6 +2,7 @@ package personal.finance.repositories;
 
 import personal.finance.models.Transaction;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface ITransactionRepository {
@@ -15,4 +16,6 @@ public interface ITransactionRepository {
     void update(long id, Transaction transaction);
     // lägg en transaktion
     void insert(Transaction transaction);
+    // används för JOIN in SQL
+    void showTransactionDetails();
 }

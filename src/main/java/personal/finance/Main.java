@@ -38,6 +38,7 @@ public class Main {
         commandService.registerCommand(new ShowBalanceCommand(transactionService));
         commandService.registerCommand(new ShowOutcomesCommand(transactionService));
         commandService.registerCommand(new ShowIncomesCommand(transactionService));
+        commandService.registerCommand(new ShowTransactionDetailsCommand(transactionService, transactionRepository));
         commandService.registerCommand(new ExitCommand(transactionService));
 
         commandService.run();
