@@ -4,7 +4,6 @@ import personal.finance.models.Transaction;
 import personal.finance.repositories.ITransactionRepository;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class DefaultTransactionService implements ITransactionService {
@@ -60,6 +59,6 @@ public class DefaultTransactionService implements ITransactionService {
 
     @Override
     public List<Transaction> getAllTransactions() {
-        return Collections.unmodifiableList(transactionList);
+        return new ArrayList<>(transactionList);
     }
 }

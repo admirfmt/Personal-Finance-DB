@@ -43,7 +43,7 @@ public class PostgresTransactionRepository implements ITransactionRepository {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
              statement.setLong(1, currentUserId);
 
-             try(ResultSet rs = statement.executeQuery()) {
+             try (ResultSet rs = statement.executeQuery()) {
                  while (rs.next()) {
                      long id = rs.getLong("id");
                      long userId = rs.getLong("user_id");

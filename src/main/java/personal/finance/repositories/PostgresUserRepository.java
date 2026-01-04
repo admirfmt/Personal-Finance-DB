@@ -1,5 +1,6 @@
 package personal.finance.repositories;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import personal.finance.models.User;
 
 import java.sql.*;
@@ -22,14 +23,16 @@ public class PostgresUserRepository implements IUserRepository {
 
     @Override
     public User register(String username, String password) {
+        String passwordHash = BCrypt.withDefaults().hashToString(12, password.toCharArray());
         String sql = "INSERT INTO users(username, password) VALUES (?, ?) RETURNING id";
+
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
-            statement.setString(2, password);
+            statement.setString(2, passwordHash);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
                     long id = rs.getLong(1);
-                    return new User(id, username, password);
+                    return new User(id, username, passwordHash);
                 }
             }
         } catch (SQLException e) {
@@ -40,16 +43,21 @@ public class PostgresUserRepository implements IUserRepository {
 
     @Override
     public User login(String username, String password) {
-        String sql = "SELECT id, username, password FROM users WHERE username = ? AND password = ?";
+        String sql = "SELECT id, username, password FROM users WHERE username = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
-            statement.setString(2, password);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
                     long id = rs.getLong("id");
                     String uname = rs.getString("username");
-                    String pwd = rs.getString("password");
-                    return new User(id, uname, pwd);
+                    String passwordHash = rs.getString("password");
+                    // verifiera
+                    BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), passwordHash);
+                    if (result.verified) {
+                        return new User(id, uname, passwordHash);
+                    } else {
+                        System.out.println("Felaktigt lösenord.");
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -69,9 +77,9 @@ public class PostgresUserRepository implements IUserRepository {
                 if (rs.next()) {
                     Long id = rs.getLong("id");
                     String uname = rs.getString("username");
-                    String password = rs.getString("password");
+                    String passwordHash = rs.getString("password");
 
-                    User user = new User(id, uname, password);
+                    User user = new User(id, uname, passwordHash);
                     return Optional.of(user);
                 }
             }
